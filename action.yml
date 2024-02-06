@@ -1,0 +1,37 @@
+name: 'Topic-Based Team Permissions'
+description: 'Configure team permissions on your repositories using topics'
+author: 'chtzvt'
+inputs:
+  prefix:
+    description: 'A standard prefix for team permission repo topics. The default is iam-'
+    default: "iam-"
+    required: false
+  gh-pat:
+    description: 'An administrative GitHub Personal Access Token'
+    required: true
+  gh-org:
+    description: 'The target GitHub organization'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v2
+
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.2'
+        bundler-cache: true
+    
+    - name: Install deps
+      shell: bash
+      run: |
+          bundle install
+
+    - name: Update Issues
+      shell: bash 
+      env:
+        GH_PAT: ${{ inputs.gh-pat }}
+        PREFIX: ${{ inputs.prefix }}
+        GH_ORG: ${{ inputs.gh-org }}
+      run: |
+        bundle exec ruby ./main.rb

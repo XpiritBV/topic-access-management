@@ -1,0 +1,9 @@
+# A prefix for access-specific topics
+prefix: "iam-"
+teams:
+  # In the configuration below, a GitHub team with the slug "example-github-team"
+  # will be granted push permissions on any repository with the topic "iam-example"
+  # applied to it.
+  example-github-team:
+    topic: example
+    permission: push # One of: admin, maintain, push, triage, pull

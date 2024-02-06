@@ -1,0 +1,37 @@
+name: Update State
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 21 * * *"
+
+env:
+  PREFIX: "iam-"
+  ORG: "${{ github.repository_owner }}"
+
+jobs:
+  update_state_files:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+
+      - name: Install deps
+        shell: bash
+        run: |
+          bundle install
+
+      - name: Update Issues
+        shell: bash 
+        env:
+          GH_PAT: ${{ secrets.GITHUB_PAT }}
+          PREFIX: ${{ env.PREFIX }}
+          GH_ORG: ${{ env.ORG }}
+        run: |
+          bundle exec ruby ./main.rb
