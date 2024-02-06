@@ -29,6 +29,8 @@ class Teams
     return @yaml['teams'][slug_or_topic]['permission'] if @yaml['teams'].key?(slug_or_topic)
 
     @yaml['teams'].select { |_k, v| v['topic'] == slug_or_topic.sub(prefix, '') }.values.first['permission']
+  rescue NoMethodError
+    nil
   end
 
   def topic(slug)

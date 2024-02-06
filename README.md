@@ -9,7 +9,7 @@ Configuration is simple. The action reads a YAML configuration file (`teams.yml`
 
 To use this action, simply clone this repository into your destination environment and configure the following repository secrets:
 
-- `GITHUB_TOKEN`: A GitHub token with the necessary permissions to manage teams and repositories in your organization.
+- `GH_ACCESS_TOKEN`: A GitHub token with the necessary permissions to manage teams and repositories in your organization. Make sure this token has all of the `repo` and `admin:org` scopes.
 
 Then, update the `teams.yml` file to match your desired configuration. The action will automatically apply the permissions defined in the configuration to any team that matches the topic of the repository.
 

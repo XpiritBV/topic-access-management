@@ -22,6 +22,10 @@ unless File.exist?('teams.yml')
   exit 1
 end
 
+puts "Examining the #{ENV['GH_ORG']} organization..."
+
+puts "Starting..."
+
 client = Octokit::Client.new(access_token: ENV['GH_PAT'])
 client.auto_paginate = true
 
@@ -48,6 +52,7 @@ all_repos = client.organization_repositories(ENV['GH_ORG'])
 repos_with_topics = all_repos.select { |repo| repo[:topics].any? { |topic| topic.start_with?(teams.prefix) } }
 
 repos_with_topics.each do |repo|
+  puts "Evaluating #{repo.full_name}..."
   repo_teams = client.repository_teams(repo.full_name)
   repo_team_topics = teams.filter_repo_topics(repo[:topics])
 
@@ -55,7 +60,7 @@ repos_with_topics.each do |repo|
     if teams.exists?(team[:slug])
       if teams.permission(team[:slug]) != team[:permission]
         # Update teams with incorect permissions
-        puts "#{team[:name]} (#{team[:slug]}) has the wrong permission level for #{repo.full_name} (expected #{teams.permission(team[:slug])}, got #{team[:permission]})"
+        puts "\t#{team[:name]} (#{team[:slug]}) has the wrong permission level for #{repo.full_name} (expected #{teams.permission(team[:slug])}, got #{team[:permission]})"
 
         client.update_repo_team_permissions(
           ENV['GH_ORG'],
@@ -65,17 +70,20 @@ repos_with_topics.each do |repo|
         )
 
       else
-        puts "#{team[:name]} (#{team[:slug]}) has correct permissions for #{repo.full_name}."
+        puts "\t#{team[:name]} (#{team[:slug]}) has correct permissions for #{repo.full_name}."
         repo_team_topics.delete(teams.topic(team[:slug]))
       end
 
     else
-      puts "#{team[:name]} (#{team[:slug]}) has access to #{repo.full_name}, but is not the teams.yml file."
+      puts "\t#{team[:name]} (#{team[:slug]}) has access to #{repo.full_name}, but is not the teams.yml file."
       # TODO: Optionally remove team from repository
     end
   end
 
   repo_team_topics.each do |topic|
+
+    next if teams.from_topic(topic).nil?
+
     # Add team to repository
     puts "Adding #{teams.from_topic(topic)} to #{repo.full_name} with #{teams.permission(topic)} permission."
 
@@ -87,3 +95,5 @@ repos_with_topics.each do |repo|
     )
   end
 end
+
+puts "Done."

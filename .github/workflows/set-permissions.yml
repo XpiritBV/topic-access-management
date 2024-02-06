@@ -1,4 +1,4 @@
-name: Update State
+name: Update Team Permissions
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ env:
   ORG: "${{ github.repository_owner }}"
 
 jobs:
-  update_state_files:
+  run_audit:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -22,15 +22,10 @@ jobs:
           ruby-version: '3.2'
           bundler-cache: true
 
-      - name: Install deps
-        shell: bash
-        run: |
-          bundle install
-
-      - name: Update Issues
+      - name: Update Permissions
         shell: bash 
         env:
-          GH_PAT: ${{ secrets.GITHUB_PAT }}
+          GH_PAT: ${{ secrets.GH_ACCESS_TOKEN }}
           PREFIX: ${{ env.PREFIX }}
           GH_ORG: ${{ env.ORG }}
         run: |
